@@ -130,7 +130,8 @@ class SimpleMemoryManager:
                     self.memory.add(
                         messages=[{"role": "user", "content": text}],
                         user_id=user_id,
-                        metadata=metadata
+                        metadata=metadata,
+                        infer=False  # 자동 번역/추론 비활성화 - 원본 언어 그대로 저장
                     )
                 except Exception as e:
                     logger.warning(f"mem0 저장 실패, 로컬만 저장: {e}")
