@@ -266,19 +266,48 @@ class SimpleMemoryManager:
             try:
                 mem0_memories = self.memory.get_all(user_id=user_id)
                 if mem0_memories:
-                    memories.extend(mem0_memories)
+                    # mem0 결과 형식 처리: {'results': [...]} 또는 리스트
+                    if isinstance(mem0_memories, dict):
+                        actual_memories = mem0_memories.get('results', [])
+                    elif isinstance(mem0_memories, list):
+                        actual_memories = mem0_memories
+                    else:
+                        actual_memories = []
+
+                    # 표준 형식으로 변환
+                    for mem in actual_memories:
+                        if isinstance(mem, dict):
+                            memories.append({
+                                "id": mem.get("id", ""),
+                                "text": mem.get("memory", mem.get("text", "")),
+                                "metadata": mem.get("metadata", {})
+                            })
+                        elif isinstance(mem, str):
+                            # 문자열인 경우 건너뛰기
+                            logger.warning(f"문자열 메모리 발견, 건너뜀: {mem[:50]}...")
+                            continue
+                        else:
+                            # 객체 형태
+                            memories.append({
+                                "id": getattr(mem, "id", ""),
+                                "text": getattr(mem, "memory", getattr(mem, "text", str(mem))),
+                                "metadata": getattr(mem, "metadata", {})
+                            })
+
+                    logger.info(f"mem0에서 {len(memories)}개 메모리 로드")
             except Exception as e:
                 logger.warning(f"mem0 조회 실패: {e}")
+                import traceback
+                traceback.print_exc()
 
         # 로컬 메모리 추가
         if user_id in self.local_memories:
             local = self.local_memories[user_id]
             # mem0 메모리와 중복 제거
-            local_ids = {m["id"] for m in local}
             mem0_ids = {m.get("id") for m in memories}
 
             for memory in local:
-                if memory["id"] not in mem0_ids:
+                if isinstance(memory, dict) and memory.get("id") not in mem0_ids:
                     memories.append(memory)
 
         # 제한 적용
