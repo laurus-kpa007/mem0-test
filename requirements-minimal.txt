@@ -1,0 +1,21 @@
+# 최소 필수 패키지 (Python 3.9+)
+# mem0 LTM 시스템 실행을 위한 핵심 패키지만 포함
+
+# Core Dependencies
+mem0ai>=0.1.0
+ollama>=0.4.0
+
+# Vector Database (로컬 사용)
+chromadb>=0.4.0
+
+# Web Framework
+streamlit>=1.40.0
+
+# Basic utilities
+requests>=2.32.0
+python-dotenv>=1.0.0
+numpy>=1.26.0
+pandas>=2.2.0
+
+# Optional - Qdrant support
+# qdrant-client>=1.12.0
